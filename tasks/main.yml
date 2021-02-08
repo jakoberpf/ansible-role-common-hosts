@@ -1,0 +1,23 @@
+---
+
+- name: Update the /etc/hosts file with ansible hostname
+  become: yes
+  lineinfile:
+    path: "/etc/hosts"
+    regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+    line: "{{ hostvars[item]['ansible_env'].SSH_CONNECTION.split(' ')[2] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+    state: present
+    backup: yes
+  when: ansible_hostname != "{{ item }}" or ansible_hostname == "{{ item }}"
+  with_items: "{{ vars['play_hosts'] }}"
+
+- name: Update the /etc/hosts file with custom hostname
+  become: yes
+  lineinfile:
+    path: "/etc/hosts"
+    regexp: ".*\t{{ hostvars[item]['hostname']}}\t{{ hostvars[item]['hostname']}}"
+    line: "{{ hostvars[item]['ansible_env'].SSH_CONNECTION.split(' ')[2] }}\t{{ hostvars[item]['hostname']}}\t{{ hostvars[item]['hostname']}}"
+    state: present
+    backup: yes
+  when: ansible_hostname != "{{ item }}" or ansible_hostname == "{{ item }}"
+  with_items: "{{ vars['play_hosts'] }}"
